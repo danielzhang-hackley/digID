@@ -6,11 +6,11 @@ library(CINNA)
 
 ####Network####
 #Construction of the protein-protein interactions network from string database
-setwd("path to data folder")
-network_actions <-read.table(file ="9606.protein.actions.v10.5.txt",header = T,sep = "\t",stringsAsFactors = F )
+# setwd("path to data folder")
+network_actions <- read.table(file ="./data/9606.protein.actions.v10.5.txt",header = T,sep = "\t",stringsAsFactors = F )
 
-#annotation_string permit to obtain  to convert Ensembl name to protein names.
-annotation<-read.table(file ="annotation_string.txt",header = T,sep = "\t",stringsAsFactors = F,quote="" )
+#annotation_string permit to obtain to convert Ensemble name to protein names.
+annotation<-read.table(file ="./data/annotation_string.txt",header = T,sep = "\t",stringsAsFactors = F,quote="" )
 annotation<-annotation[,1:2]
 
 #replace Ensembl names by official protein names
@@ -36,8 +36,8 @@ sum(network_actions_directed_acting_900$item_id_a==network_actions_directed_acti
 proteins_actions_directed_acting_900<-unique(c(network_actions_directed_acting_900$item_id_a,network_actions_directed_acting_900$item_id_b))
 
 ####input predicted AD associated genes####
-setwd("path to result folder")
-DE_proteins<-read.csv('Predicted_AD_associated_genes.csv')
+# setwd("path to result folder")
+DE_proteins<-read.csv('./results/Predicted_AD_associated_genes.csv')
 DE_proteins<-DE_proteins[,2]
 
 ####Contexctualization of the network####
@@ -63,5 +63,5 @@ result<-calculate_centralities(Main_g, include = pr_cent[29])
 result<-as.data.frame(do.call(cbind, result))
 
 ###output the result###
-write.csv(result, file='AD_gene_centrality-scores.csv')
+write.csv(result, file='./results/AD_gene_centrality-scores.csv')
 

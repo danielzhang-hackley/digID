@@ -1,23 +1,19 @@
 import numpy as np
 import pandas as pd
-import os
 from tensorflow import keras
 from ladder_net import get_ladder_network_fc
 from sklearn.preprocessing import StandardScaler
-import random
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 from scipy.stats import sem
 
 # run start
-os.chdir('path to data folder')
-output = 'path to result folder'
-class_label = './AD_labels.csv'
-official_name = './gene_ID_name.csv'
+class_label = r'./data/AD_labels.csv'
+official_name = r'./data/gene_ID_name.csv'
 
 # get the dataset
 print('Input data...')
-x = pd.read_csv('./GO_PATHWAY_EXP_PPI_combined_data.csv', index_col="entrezId", sep=",", header=0, na_values=["?"])
+x = pd.read_csv(r'./data/GO_PATHWAY_EXP_PPI_combined_data.csv', index_col="entrezId", sep=",", header=0, na_values=["?"])
 
 # input class labels
 classes = pd.read_csv(class_label, index_col="entrezId", sep=",", header=0, na_values=["?"])
@@ -122,6 +118,6 @@ print('Performance summary:')
 print("Average accuracy: %f " % np.average(ACC), "Standard Error: %f" % sem(ACC))
 print("Average AUC: %f " % np.average(AUC), "Standard Error: %f" % sem(AUC))
 print("Average f1: %f " % np.average(f1), "Standard Error: %f" % sem(f1))
-AD_genes.to_csv(output + "Predicted_AD_associated_genes.csv")
+AD_genes.to_csv(r"./results/Predicted_AD_associated_genes.csv")
 
 
