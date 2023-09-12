@@ -66,7 +66,7 @@ for i, (train, test) in enumerate(kf.split(x, Y)):
     y_train_labeled_rep = np.concatenate([y_train_labeled]*n_rep)
     y_train_labeled_rep = np.concatenate((y_train_labeled_rep, y_train_labeled[addition]))
 
-    for run in range(5):
+    for run in range(10):
         # initialize the model
         model = get_ladder_network_fc(layer_sizes=[inp_size, 1000, 500, 250, 250, 250, n_classes])
 
