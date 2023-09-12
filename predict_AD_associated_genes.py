@@ -110,7 +110,7 @@ for i, (train, test) in enumerate(kf.split(x, Y)):
 
 AD_genes = pd.DataFrame.median(All_probability, axis=1)
 AD_genes = pd.Series.to_frame(AD_genes)
-AD_genes = AD_genes[AD_genes[0] > 0.77]
+AD_genes = AD_genes[AD_genes[0] > 0.75]
 geneName = pd.read_csv(official_name, index_col="entrezId", sep=",", header=0)
 AD_genes = AD_genes.join(geneName, how='left', lsuffix="_lsuf").sort_index().drop(columns=0)
 
