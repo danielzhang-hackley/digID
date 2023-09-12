@@ -27,7 +27,7 @@ n_classes = 2
 gene = x.index
 x = x.to_numpy()
 kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
-AUC, ACC, AUC_samples, f1 = np.zeros(25), np.zeros(25), np.zeros(25), np.zeros(25)
+AUC, ACC, f1 = np.zeros(50), np.zeros(50), np.zeros(50)
 training = 45
 count = 0
 
@@ -94,9 +94,9 @@ for i, (train, test) in enumerate(kf.split(x, Y)):
                 old_acc = test_acc
                 old_f1 = test_f1
                 y_all_pr = model.test_model.predict(sc.transform(x), batch_size=100)
+        print("########################################################")        
         print("Test accuracy: %f" % old_acc, "AUC: %f" % old_auc, "f1: %f" % old_f1)
-        print("########################################################")
-        print("########################################################")       
+        print("########################################################")         
         ACC[count] = old_acc
         AUC[count] = old_auc
         f1[count] = old_f1
