@@ -1,19 +1,24 @@
 import numpy as np
 import pandas as pd
+import os
 from tensorflow import keras
 from ladder_net import get_ladder_network_fc
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
+import random
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 from scipy.stats import sem
+from statistics import stdev
 
 # run start
-class_label = r'./data/AD_labels.csv'
-official_name = r'./data/gene_ID_name.csv'
+os.chdir('path to data folder')
+output = 'path to result folder'
+class_label = './Data/AD_labels.csv'
+official_name = './Data/gene_ID_name.csv'
 
 # get the dataset
 print('Input data...')
-x = pd.read_csv(r'./data/GO_PATHWAY_EXP_PPI_combined_data.csv', index_col="entrezId", sep=",", header=0, na_values=["?"])
+x = pd.read_csv('./Data/GO_PATHWAY_EXP_PPI_combined_data.csv', index_col="entrezId", sep=",", header=0, na_values=["?"])
 
 # input class labels
 classes = pd.read_csv(class_label, index_col="entrezId", sep=",", header=0, na_values=["?"])
@@ -27,13 +32,13 @@ n_classes = 2
 gene = x.index
 x = x.to_numpy()
 kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
-AUC, ACC, f1 = np.zeros(50), np.zeros(50), np.zeros(50)
+AUC, ACC = np.zeros(50), np.zeros(50)
 training = 45
 count = 0
 
 for i, (train, test) in enumerate(kf.split(x, Y)):
     print('############')
-    print(f'# fold {i+1}   #')
+    print(f'#  fold {i+1}  #')
     print('############')
     sc = StandardScaler()
     X_train = sc.fit_transform(x[train])
@@ -81,25 +86,21 @@ for i, (train, test) in enumerate(kf.split(x, Y)):
             y_test_pr = model.test_model.predict(X_test, batch_size=100)
             test_auc = roc_auc_score(y_TEST, y_test_pr, average='micro')
             test_acc = accuracy_score(y_TEST.argmax(-1), y_test_pr.argmax(-1))
-            test_f1 = f1_score(y_TEST.argmax(-1), y_test_pr.argmax(-1), average='weighted')
             if k == 0:
                 old_train_acc = train_acc
                 old_auc = test_auc
                 old_acc = test_acc
-                old_f1 = test_f1
                 y_all_pr = model.test_model.predict(sc.transform(x), batch_size=100)
             elif train_acc >= old_train_acc:
                 old_train_acc = train_acc
                 old_auc = test_auc
                 old_acc = test_acc
-                old_f1 = test_f1
                 y_all_pr = model.test_model.predict(sc.transform(x), batch_size=100)
-        print("########################################################")        
-        print("Test accuracy: %f" % old_acc, "AUC: %f" % old_auc, "f1: %f" % old_f1)
-        print("########################################################")         
+        print("#################################################################################")
+        print("Test accuracy: %f" % old_acc, "AUC: %f" % old_auc)
+        print("#################################################################################")
         ACC[count] = old_acc
         AUC[count] = old_auc
-        f1[count] = old_f1
         if i == 0 and run == 0:
             All_probability = pd.DataFrame(gene)
             All_probability = All_probability.set_index('entrezId')
@@ -115,9 +116,6 @@ geneName = pd.read_csv(official_name, index_col="entrezId", sep=",", header=0)
 AD_genes = AD_genes.join(geneName, how='left', lsuffix="_lsuf").sort_index().drop(columns=0)
 
 print('Performance summary:')
-print("Average accuracy: %f " % np.average(ACC), "Standard Error: %f" % sem(ACC))
-print("Average AUC: %f " % np.average(AUC), "Standard Error: %f" % sem(AUC))
-print("Average f1: %f " % np.average(f1), "Standard Error: %f" % sem(f1))
-AD_genes.to_csv(r"./results/Predicted_AD_associated_genes.csv")
-
-
+print("Average accuracy: %f " % np.average(ACC), "Standard Error: %f" % sem(ACC), "Standard deviation: %f" % stdev(ACC))
+print("Average AUC: %f " % np.average(AUC), "Standard Error: %f" % sem(AUC), "Standard deviation: %f" % stdev(AUC))
+AD_genes.to_csv(output + "predicted_AD_genes.csv")
