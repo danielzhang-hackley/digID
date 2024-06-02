@@ -4,16 +4,15 @@ library(zoo)
 library(CTDquerier)
 library(CINNA)
 
-####Network####
-#Construction of the protein-protein interactions network from string database
-# setwd("path to data folder")
-network_actions <- read.table(file ="./data/9606.protein.actions.v10.5.txt",header = T,sep = "\t",stringsAsFactors = F )
+#Construction of the protein-protein interactions network from String database
+setwd('path to data files')
+network_actions <-read.table(file ="9606.protein.actions.v10.5.txt",header = T,sep = "\t",stringsAsFactors = F )
 
-#annotation_string permit to obtain to convert Ensemble name to protein names.
-annotation<-read.table(file ="./data/annotation_string.txt",header = T,sep = "\t",stringsAsFactors = F,quote="" )
+#convert Ensembl name to protein names.
+annotation<-read.table(file ="annotation_string.txt",header = T,sep = "\t",stringsAsFactors = F,quote="" )
 annotation<-annotation[,1:2]
 
-#replace Ensembl names by official protein names
+#replace Ensembl names by regular protein names
 network_actions<-merge(x = network_actions, y = annotation,by.x="item_id_a",by.y="protein_external_id")
 network_actions<-network_actions[,-which(colnames(network_actions)=="item_id_a")]
 colnames(network_actions)[which(colnames(network_actions)=="preferred_name")]<-"item_id_a"
@@ -35,16 +34,16 @@ network_actions_directed_acting_900<-unique(network_actions_directed_acting_900)
 sum(network_actions_directed_acting_900$item_id_a==network_actions_directed_acting_900$item_id_b)
 proteins_actions_directed_acting_900<-unique(c(network_actions_directed_acting_900$item_id_a,network_actions_directed_acting_900$item_id_b))
 
-####input predicted AD associated genes####
-# setwd("path to result folder")
-DE_proteins<-read.csv('./results/Predicted_AD_associated_genes.csv')
-DE_proteins<-DE_proteins[,2]
+####input predicted AD genes####
+setwd('path to the predicted AD gene file')
+DE_proteins<-read.csv('./predicted_AD_genes.csv')
+DE_proteins<-DE_proteins[,1]
 
-####Contexctualization of the network####
+#add relations with DE_proteins under a score of 900 to the network
 network<-network_actions_directed_acting_900[network_actions_directed_acting_900$item_id_a%in%DE_proteins & network_actions_directed_acting_900$item_id_b%in%DE_proteins,]
 network<-unique(network)
 
-#The network is transform as an igraph object
+#transform the network to an igraph object
 graph<-graph_from_data_frame(network)
 
 ####Cliques calculation and select the largest clique#######
@@ -53,6 +52,8 @@ proteins_clustered<- unique(names(unlist(clique)))
 Fnetwork<- network[network$item_id_a%in%proteins_clustered & network$item_id_b%in%proteins_clustered,]
 Fnetwork<-as.matrix(Fnetwork)
 Fnetwork<-unique(Fnetwork)
+
+## calculate centrality scores
 g <- graph_from_edgelist(Fnetwork, directed=TRUE)
 c <- components(g)
 V(g)$group <- c$membership
@@ -61,7 +62,12 @@ Main_g = induced_subgraph(g, which(V(g)$group == BigComp))
 pr_cent<-proper_centralities(Main_g)
 result<-calculate_centralities(Main_g, include = pr_cent[29])
 result<-as.data.frame(do.call(cbind, result))
+result=cbind(rownames(result),result[,1])
+colnames(result)=c('gene_name', 'centrality_score')
+result=as.data.frame(result)
+result = result[order(result$centrality_score, decreasing=TRUE),]
 
-###output the result###
-write.csv(result, file='./results/AD_gene_centrality-scores.csv')
+# output the result
+write.csv(result, file='path to result file',row.names=FALSE)
+
 
