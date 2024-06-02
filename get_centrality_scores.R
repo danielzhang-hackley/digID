@@ -70,4 +70,3 @@ result = result[order(result$centrality_score, decreasing=TRUE),]
 # output the result
 write.csv(result, file='path to result file',row.names=FALSE)
 
-
