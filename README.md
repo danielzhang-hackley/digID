@@ -5,11 +5,10 @@ This is a pipeline for identifying candidate drug targets for diseases. This pro
 This project is currently in the process of submitting for publication, in collaboration with the Brody School of Medicine.
 
 ## Dependencies
-Both Python and R are required to run this pipeline. The packages required for both Python and R are specified in `requirements_python.txt` and `requirements_r.txt`, respectively.
+Both Python and R are required to run this pipeline. The packages required for both Python and R are specified in `requirements_python.txt` and `requirements_r.txt`, respectively. Python 3.9 was used on MacOS.
 
 ## Data
 The data for this project is currently stored in [Google Drive](https://drive.google.com/drive/u/1/folders/1AeBow8IXNZIheAO4w3kvgUhp04bW3kYA). This is a folder that contains:
-- `GO_PATHWAY_EXP_PPI_combined_data.csv`: gene ontology, pathway annotation, gene expression, and protein-protein interaction data for training the semi-supervised machine learning model to predict AD associated genes
 - `AD_labels.csv`: labels for machine learning
 - `9606.protein.actions.v10.5.txt`: protein-protein interaction data, used for constructing the interaction network for network analysis to rank the genes predicted by the semi-supervised machine learning model
 - `gene_ID_name.csv`: map between different gene naming conventions
