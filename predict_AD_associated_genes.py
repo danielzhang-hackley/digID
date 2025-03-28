@@ -12,7 +12,7 @@ from statistics import stdev
 data_dir = 'data directory'
 output = 'result directory'
 
-features = 'GO_PATHWAY_EXP_PPI_combined_data.csv'
+features = 'path/to/your/patient/and/knowledge/data.csv'
 class_label = 'AD_labels.csv'
 
 # get the dataset
